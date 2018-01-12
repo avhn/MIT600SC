@@ -1,0 +1,45 @@
+Algorithm needs,
+- List, contains all combinations of subjects
+- Selector code best
+
+List, contains all combinations - allAdvices and maxWork comparer func
+
+List, maxWork, gets(dict)
+1. set work to 0
+2. iterate over dict
+3. add current work to work
+4. return maxWork <= work
+
+List, allAdvices
+1. Iterate over subjects and set prev_loop list as subject list as dicts
+2. add prev_loop to allAdvices
+
+3. while prev_loop's length is not 0, iterate over all
+4. set new_loop as empty
+
+5. Iterate prev_loop list,
+6. Iterate over subjects,
+7. if subject is in item return to 6
+8. add current item from 5 and subject,
+if new item is considerable for maxWork, append new_loop list
+9. return to 6
+
+10. set prev_loop to new_loop
+11.add prev_loop to allAdvices
+
+Selector, gets best advice - best
+- Subject dict value function
+- Iterator
+
+Selector, greater than func part., gets (dict1, dict2)
+1. Set valueA and valueB to 0
+2. Iterate over dicts and get total work hours
+3. return valueA >= valueB
+
+Selector, iterator
+1. set best to random choice in allAdvices
+2. Iterate allAdvices
+3. if current better than best, best is current
+4. return to 2
+5. return best
+

@@ -1,0 +1,27 @@
+# example trigger file
+
+# subject trigger named t2
+t2 SUBJECT Japan
+
+# phrase trigger named t3
+t3 PHRASE Supreme Court
+
+# title trigger c1
+c1 TITLE Blockchain
+
+# subject trigger c2
+c2 SUBJECT China
+
+# title trigger c3
+c3 TITLE Trump
+
+# composite trigger examples
+c4 AND c1 c2 c3
+c5 AND c1 t3
+c6 AND c1 c3
+c7 OR c5 c6
+t4 AND t2 t3
+
+# add triggers
+ADD t1 t4 c4 c6
+
