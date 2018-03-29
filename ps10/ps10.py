@@ -1,8 +1,10 @@
 # Problem Set 10
 # Name: Mert Dede
 
-#Code shared across examples
-import pylab, random, string, copy, math
+import pylab
+import random
+import string
+
 
 class Point(object):
     def __init__(self, name, originalAttrs, normalizedAttrs = None):
@@ -10,26 +12,33 @@ class Point(object):
         self.name = name
         self.unNormalized = originalAttrs
         self.attrs = normalizedAttrs
+
     def dimensionality(self):
         return len(self.attrs)
+
     def getAttrs(self):
         return self.attrs
+
     def getOriginalAttrs(self):
         return self.unNormalized
+
     def distance(self, other):
         #Euclidean distance metric
         difference = self.attrs - other.attrs
         return sum(difference * difference) ** 0.5
+
     def getName(self):
         return self.name
+
     def toStr(self):
         return self.name + str(self.attrs)
+
     def __str__(self):
         return self.name
-    
+
 class County(Point):
     ## weights = pylab.array([1.0] * 14)
-    
+
     vector = [1.0] * 14
     vector[3-1] = 0
     vector[2-1] = 0 # HomeValue
@@ -39,22 +48,25 @@ class County(Point):
     vector[9-1] = 0.5 # HSGraduate
     vector[8-1] = 0 # PrcntFemale
     vector[6-1] = 0.25 # Prcnt65+
-    
+
     weights = pylab.array(vector)
-    
+
     # Override Point.distance to use County.weights to decide the
     # significance of each dimension
     def distance(self, other):
         difference = self.getAttrs() - other.getAttrs()
         return sum(County.weights * difference * difference) ** 0.5
-    
+
+
 class Cluster(object):
     def __init__(self, points, pointType):
         self.points = points
         self.pointType = pointType
         self.centroid = self.computeCentroid()
+
     def getCentroid(self):
         return self.centroid
+
     def computeCentroid(self):
         dim = self.points[0].dimensionality()
         totVals = pylab.array([0.0]*dim)
@@ -64,6 +76,7 @@ class Cluster(object):
                                    totVals/float(len(self.points)),
                                    totVals/float(len(self.points)))
         return meanPoint
+
     def update(self, points):
         oldCentroid = self.centroid
         self.points = points
@@ -72,24 +85,29 @@ class Cluster(object):
             return oldCentroid.distance(self.centroid)
         else:
             return 0.0
+
     def getPoints(self):
         return self.points
+
     def contains(self, name):
         for p in self.points:
             if p.getName() == name:
                 return True
         return False
+
     def toStr(self):
         result = ''
         for p in self.points:
             result = result + p.toStr() + ', '
         return result[:-2]
+
     def __str__(self):
         result = ''
         for p in self.points:
             result = result + str(p) + ', '
         return result[:-2]
-    
+
+
 def kmeans(points, k, cutoff, pointType, minIters = 3, maxIters = 100, toPrint = False):
     """ Returns (Cluster list, max dist of any point to its cluster) """
     #Uses random initial centroids
@@ -130,6 +148,7 @@ def kmeans(points, k, cutoff, pointType, minIters = 3, maxIters = 100, toPrint =
     print(biggestChange)
     return clusters, maxDist
 
+
 #US Counties example
 def readCountyData(fName, numEntries = 14):
     dataFile = open(fName, 'r')
@@ -157,7 +176,8 @@ def readCountyData(fName, numEntries = 14):
         dataList.append(features)
         nameList.append(name)
     return nameList, dataList, maxVals
-    
+
+
 def buildCountyPoints(fName):
     """
     Given an input filename, reads County values from the file and returns
@@ -170,6 +190,7 @@ def buildCountyPoints(fName):
         normalizedAttrs = originalAttrs/pylab.array(maxVals)
         points.append(County(nameList[i], originalAttrs, normalizedAttrs))
     return points
+
 
 def randomPartition(l, p):
     """
@@ -191,6 +212,7 @@ def randomPartition(l, p):
         else:
             l2.append(x)
     return (l1,l2)
+
 
 def getAveIncome(cluster):
     """
@@ -227,10 +249,11 @@ def test(points, k = 200, cutoff = 0.1):
     pylab.ylabel('Number of Clusters')
     pylab.show()
 
+
 def graphRemovedErr(points, kvals = [25, 50, 75, 100, 125, 150], cutoff = 0.1):
-    
+
     errors = dict() #contains tuples as (holdout error, training error)
-    
+
     for k in kvals:
         holdoutSet, trainingSet = randomPartition(points, 0.2)
         trainingClusters, maxDist = kmeans(trainingSet, k, cutoff, County)
@@ -246,9 +269,9 @@ def graphRemovedErr(points, kvals = [25, 50, 75, 100, 125, 150], cutoff = 0.1):
             for c in trainingClusters:
                 if minDist is None or minDist > p.distance( c.getCentroid() ):
                     minDist = p.distance( c.getCentroid() )
-                    
+
             holdoutError.append( minDist**2 )
-        
+
         errors[k] = sum(holdoutError), sum(trainingError)
 
     # Plotting #
@@ -260,7 +283,7 @@ def graphRemovedErr(points, kvals = [25, 50, 75, 100, 125, 150], cutoff = 0.1):
         pylab.title( 'k: ' + str(k) )
         pylab.ylabel( ' Error Value ' )
         # pylab.ylim(0, errors[ kvals[0] ][1]+errors[ kvals[0] ][0] )
-        
+
         pylab.hist( errors[k][0], label = ' Holdout Set ' , orientation = 'horizontal')
         pylab.hist( errors[k][1], label = ' Training Set  ', orientation = 'horizontal' )
         pylab.legend( loc = 'best' )
@@ -272,9 +295,10 @@ def graphRemovedErr(points, kvals = [25, 50, 75, 100, 125, 150], cutoff = 0.1):
     errorRatio = list()
     for k in kvals: errorRatio.append( float(errors[k][1])/errors[k][0] )
     pylab.plot(kvals, errorRatio)
-    
+
     pylab.show()
-    
+
+
 def get_aveVal(cluster, dimension):
     tot = 0.0
     numElems = 0
@@ -282,6 +306,7 @@ def get_aveVal(cluster, dimension):
         tot += c.getOriginalAttrs()[dimension-1]
 
     return float(tot) / len(cluster.getPoints())
+
 
 def getPredictionErr(holdoutSet, nearestCluster, trainingClusters, aveVal, dimension):
     """
@@ -291,10 +316,11 @@ def getPredictionErr(holdoutSet, nearestCluster, trainingClusters, aveVal, dimen
     aveVal: dict, keys as trainingClusters clusters
     dimension: int
     """
-    
+
     error = list()
-   
+
     return error
+
 
 def graphPredictionErr(points, dimension, kvals = [25, 50, 75, 100, 125, 150], cutoff = 0.1):
     """
@@ -343,7 +369,7 @@ def graphPredictionErr(points, dimension, kvals = [25, 50, 75, 100, 125, 150], c
         pylab.hist( plotData[k], label = ' Poverty std error ')
 
     pylab.show()
-            
+
 
 def graphPredictionErr2(points, dimension, kvals = [25, 50, 75, 100, 125, 150], cutoff = 0.1):
     """
@@ -391,6 +417,7 @@ def graphPredictionErr2(points, dimension, kvals = [25, 50, 75, 100, 125, 150], 
         pylab.hist( plotData[k], label = ' Poverty std error ')
 
     pylab.show()
+
 
 ##if __name__ == '__main__':
 ##    points = buildCountyPoints('counties.txt')

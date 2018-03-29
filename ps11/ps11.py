@@ -6,16 +6,14 @@
 # Finding shortest paths through MIT buildings
 #
 
-import string
 from graph import Digraph, Edge, Node
 
-
 # Problem 2: Building up the Campus Map
-
+#
 # Edge class outdoorDist and totalDist added
 # Digraph class rewrited hasNode and created getNode, edgesOf
 # childrenOf changed
-    
+
 class Stack(object):
     """
     Helper class to backtrack path for depth-first search.
@@ -26,22 +24,19 @@ class Stack(object):
 
     def getData(self):
         return self.data
-    
+
     def push(self, item):
         self.data.insert(0, item)
-        #self.data.append(item)
+
     def pop(self):
-        item = self.data[0]
-        del self.data[0]
-        return item
+        return self.data.pop(0)
 
     def showTop(self):
         return self.getData()[0]
 
     def getpath(self):
-
         return self.getData()[::-1]
-    
+
     def __len__(self):
         return len(self.getData())
 
@@ -72,8 +67,8 @@ def load_map(mapFilename):
     for line in mapFile:
         line = line.split()
         src, dest, totalDist, outdoorDist = \
-        Node(line[0]), Node(line[1]), line[2], line[3]
-        
+            Node(line[0]), Node(line[1]), line[2], line[3]
+
         if not graph.hasNode(src):
             graph.addNode(src)
         if not graph.hasNode(dest):
@@ -90,8 +85,11 @@ def load_map(mapFilename):
 # State the optimization problem as a function to minimize
 # and the constraints
 #
+
+
 class noSuchPath(Exception):
     pass
+
 
 def depthfirst(digraph, start, end):
     """
@@ -104,7 +102,7 @@ def depthfirst(digraph, start, end):
     def move():
         if len(stack) is 0:
             stack.push( digraph.getNode(start))
-        
+
         for e in digraph.edgesOf( stack.showTop() ):
             if e.getDestination() in stack.getData():
                 continue
@@ -119,8 +117,9 @@ def depthfirst(digraph, start, end):
             stack.pop()
     move()
     return paths
-    
-def bruteForceSearch(digraph, start, end, maxTotalDist= 3000, maxDistOutdoors = 3000):    
+
+
+def bruteForceSearch(digraph, start, end, maxTotalDist= 3000, maxDistOutdoors = 3000):
     """
     Finds the shortest path from start to end using brute-force approach.
     The total distance travelled on the path must not exceed maxTotalDist, and
@@ -165,10 +164,13 @@ def bruteForceSearch(digraph, start, end, maxTotalDist= 3000, maxDistOutdoors = 
     if path is None:
         raise ValueError('No such path')
     return path
-        
+
+
 #
 # Problem 4: Finding the Shorest Path using Optimized Search Method
 #
+
+
 class pathOptimizer(object):
     """
     Contains shortest current path and it's total distance
@@ -186,7 +188,8 @@ class pathOptimizer(object):
 
     def result(self):
         return self.path
-    
+
+
 def optimizedDfs(digraph, start, end, maxTotalDist, maxDistOutdoors):
     """
     Depth-first search with backtracking.
@@ -194,7 +197,7 @@ def optimizedDfs(digraph, start, end, maxTotalDist, maxDistOutdoors):
 
     path = pathOptimizer()
     stack = Stack()
-    
+
     def move(pathObject, totalDist = 0, outdoorsDist = 0):
         """
         Recursive function.
@@ -203,7 +206,7 @@ def optimizedDfs(digraph, start, end, maxTotalDist, maxDistOutdoors):
             return
         if len(stack) is 0:
             stack.push( digraph.getNode(start))
-        
+
         for e in digraph.edgesOf( stack.showTop() ):
             if e.getDestination() in stack.getData():
                 continue
@@ -211,20 +214,21 @@ def optimizedDfs(digraph, start, end, maxTotalDist, maxDistOutdoors):
             stack.push( e.getDestination() )
             totalDist += e.gettotalDist()
             outdoorsDist += e.getoutdoorDist()
-            
+
             if stack.showTop() is digraph.getNode(end) and totalDist <= maxTotalDist and outdoorsDist <= maxDistOutdoors:
                 if pathObject.shortest() is None or pathObject.shortest() > totalDist:
                     pathObject.update(stack.getpath(), totalDist)
             else:
                 move(pathObject, totalDist, outdoorsDist)
-                
+
             stack.pop()
             totalDist -= e.gettotalDist()
             outdoorsDist -= e.getoutdoorDist()
 
     move(path)
     return path.result()
-    
+
+
 def directedDFS(digraph, start, end, maxTotalDist, maxDistOutdoors):
     """
     Finds the shortest path from start to end using directed depth-first.
@@ -253,9 +257,8 @@ def directedDFS(digraph, start, end, maxTotalDist, maxDistOutdoors):
     path = optimizedDfs(digraph, start, end, maxTotalDist, maxDistOutdoors)
     if len(path) is 0:
         raise ValueError('No such path')
-    
-    return path
 
+    return path
 
 
 #### Uncomment below when ready to test
@@ -340,12 +343,12 @@ if __name__ == '__main__':
         bruteForceSearch(digraph, '8', '50', LARGE_DIST, 0)
     except ValueError:
         bruteRaisedErr = 'Yes'
-    
+
     try:
         directedDFS(digraph, '8', '50', LARGE_DIST, 0)
     except ValueError:
         dfsRaisedErr = 'Yes'
-    
+
     print "Expected: No such path! Should throw a value error."
     print "Did brute force search raise an error?", bruteRaisedErr
     print "Did DFS search raise an error?", dfsRaisedErr
@@ -361,12 +364,12 @@ if __name__ == '__main__':
         bruteForceSearch(digraph, '10', '32', 100, LARGE_DIST)
     except ValueError:
         bruteRaisedErr = 'Yes'
-    
+
     try:
         directedDFS(digraph, '10', '32', 100, LARGE_DIST)
     except ValueError:
         dfsRaisedErr = 'Yes'
-    
+
     print "Expected: No such path! Should throw a value error."
     print "Did brute force search raise an error?", bruteRaisedErr
     print "Did DFS search raise an error?", dfsRaisedErr

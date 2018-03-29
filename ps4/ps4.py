@@ -10,6 +10,7 @@ WORDLIST_FILENAME = "words.txt"
 # -----------------------------------
 # Helper code
 # (you don't need to understand this helper code)
+
 def load_words():
     """
     Returns a list of valid words. Words are strings of lowercase letters.
@@ -29,6 +30,7 @@ def load_words():
 
 wordlist = load_words()
 
+
 def is_word(wordlist, word):
     """
     Determines if word is a valid word.
@@ -47,6 +49,7 @@ def is_word(wordlist, word):
     word = word.strip(" !@#$%^&*()-_+={}[]|\:;'<>?,./\"")
     return word in wordlist
 
+
 def random_word(wordlist):
     """
     Returns a random word.
@@ -56,6 +59,7 @@ def random_word(wordlist):
     """
     return random.choice(wordlist)
 
+
 def random_string(wordlist, n):
     """
     Returns a string containing n random words from wordlist
@@ -64,6 +68,7 @@ def random_string(wordlist, n):
     returns: a string of random words separated by spaces.
     """
     return " ".join([random_word(wordlist) for _ in range(n)])
+
 
 def random_scrambled(wordlist, n):
     """
@@ -83,6 +88,7 @@ def random_scrambled(wordlist, n):
     shifts = [(i, random.randint(0, 26)) for i in range(len(s)) if s[i-1] == ' ']
     return apply_shifts(s, shifts)[:-1]
 
+
 def get_fable_string():
     """
     Returns a fable in encrypted text.
@@ -91,12 +97,14 @@ def get_fable_string():
     fable = str(f.read())
     f.close()
     return fable
+
 # (end of helper code)
 # -----------------------------------
 
 #
 # Problem 1: Encryption
 #
+
 def build_coder(shift):
     """
     Returns a dict that can apply a Caesar cipher to a letter.
@@ -120,15 +128,16 @@ def build_coder(shift):
     """
     lower = string.lowercase + ' '; upper = string.uppercase + ' '
     length = len(upper)
-    
+
     cipher = dict()
     for i in range(length):
         cipher_i = (i + shift)%length
-        
+
         cipher[ upper[i] ] = upper[cipher_i]
         cipher[ lower[i] ] = lower[cipher_i]
 
     return cipher
+
 
 def build_encoder(shift):
     """
@@ -191,6 +200,7 @@ def build_decoder(shift):
     """
     return build_coder(-shift)
 
+
 def apply_coder(text, coder):
     """
     Applies the coder to the text. Returns the encoded text.
@@ -211,8 +221,9 @@ def apply_coder(text, coder):
         if char in tester:
             char = coder[char]
         new_text += char
-  
+
     return new_text
+
 
 def apply_shift(text, shift):
     """
@@ -232,10 +243,11 @@ def apply_shift(text, shift):
     'Apq hq hiham a.'
     """
     return apply_coder(text, build_coder(shift))
-   
+
 #
 # Problem 2: Codebreaking.
 #
+
 def find_best_shift(wordlist, text):
     """
     Decrypts the encoded text and returns the plaintext.
@@ -261,12 +273,13 @@ def find_best_shift(wordlist, text):
             if is_word(wordlist, word):
                 count += 1
         if result[0] < count: result = (count, shift)
-        
+
     return result[1]
 
 #
 # Problem 3: Multi-level encryption.
 #
+
 def apply_shifts(text, shifts):
     """
     Applies a sequence of shifts to an input text.
@@ -291,6 +304,7 @@ def apply_shifts(text, shifts):
 
     return new_text
 
+
 def apply_shifts_decoder(text, shifts):
     """
     Applies reverse encryption for decoding text with multi-level encryption keys.
@@ -307,8 +321,9 @@ def apply_shifts_decoder(text, shifts):
     for e in shifts:
         start, shift = e
         new_text = new_text[:start] + apply_shift(new_text[start:], -shift) ## -shift for decoding
- 
+
     return new_text
+
 #
 # Problem 4: Multi-level decryption.
 #
@@ -343,6 +358,7 @@ def find_best_shifts(wordlist, text):
     """
     return find_best_shifts_rec(wordlist, text, 0)
 
+
 def find_best_shifts_rec(wordlist, text, start):
     """
     Given a scrambled string and a starting position from which
@@ -359,7 +375,7 @@ def find_best_shifts_rec(wordlist, text, start):
     """
     for i in range(0,27):
         s = text[:start] + apply_coder(text[start:], build_decoder(i))
-        
+
         space = s.find(' ', start)
         if space != -1:
             if is_word(wordlist, s[start:space]):
@@ -370,7 +386,8 @@ def find_best_shifts_rec(wordlist, text, start):
             if is_word(wordlist, s[start:]):
                 return [(start, i)]
     return None
-            
+
+
 def decrypt_fable():
     """
     Using the methods you created in this problem set,
@@ -381,16 +398,15 @@ def decrypt_fable():
 
     returns: string - fable in plain text
     """
-    
+
     fable = get_fable_string()
     shifts = find_best_shifts(wordlist, fable)
-    
+
     return apply_shifts_decoder(fable, shifts)
 
-    
+
 # What is the moral of the story?
 # Mistakes are always basic and fundamental
 # We should focus doing things progressive and basic way to minimize errors 
 # and master the basics
 # In this regard, testing is always important
-#

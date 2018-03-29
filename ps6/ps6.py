@@ -3,12 +3,11 @@
 
 import math
 import random
-
-import ps6_visualize
 import pylab
+import ps6_visualize
+
 
 # === Provided classes
-
 class Position(object):
     """
     A Position represents a location in a two-dimensional room.
@@ -19,10 +18,13 @@ class Position(object):
         """
         self.x = x
         self.y = y
+
     def getX(self):
         return self.x
+
     def getY(self):
         return self.y
+
     def getNewPosition(self, angle, speed):
         """
         Computes and returns the new Position after a single clock-tick has
@@ -45,8 +47,8 @@ class Position(object):
         new_y = old_y + delta_y
         return Position(new_x, new_y)
 
-# === Problems 1
 
+# === Problems 1
 class RectangularRoom(object):
     """
     A RectangularRoom represents a rectangular region containing clean or dirty
@@ -68,6 +70,7 @@ class RectangularRoom(object):
         self.h = height
 
         self.cleaned = list()
+
     def cleanTileAtPosition(self, pos):
         """
         Mark the tile under the position POS as cleaned.
@@ -155,6 +158,7 @@ class Robot(object):
         self.direction = random.choice(range(360))
         
         self.pos = self.room.getRandomPosition()
+
     def getRobotPosition(self):
         """
         Return the position of the robot.
@@ -198,6 +202,7 @@ class Robot(object):
         self.pos = self.pos.getNewPosition(self.direction, self.speed)
         self.room.cleanTileAtPosition(self.pos)
 
+
 # === Problem 2
 class StandardRobot(Robot):
     """
@@ -221,10 +226,12 @@ class StandardRobot(Robot):
                 break
             self.setRobotDirection(random.randrange(360))
 
+
 # === Problem 3
 def check_coverage(room, min_coverage):
     covered = float(room.getNumCleanedTiles()) / float(room.getNumTiles())
     return min_coverage <= covered
+
 
 def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
                   robot_type, runAnim = True):
@@ -279,8 +286,8 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     mean = float(sum(trials))/len(trials)
     return mean
 
-# === Problem 4
 
+# === Problem 4
 def showPlot1():
     """
     Produces a plot showing dependence of cleaning time on number of robots.
@@ -303,7 +310,8 @@ def showPlot1():
     pylab.plot(robots, trials)
     pylab.legend(['Standard Robot'])
     pylab.show()
-    
+
+
 def showPlot2():
     """
     Produces a plot showing dependence of cleaning time on room shape.
@@ -328,8 +336,8 @@ def showPlot2():
     pylab.plot(ratio, data)
     pylab.show()
 
-# === Problem 5
 
+# === Problem 5
 class RandomWalkRobot(Robot):
     """
     A RandomWalkRobot is a robot with the "random walk" movement strategy: it
@@ -346,7 +354,6 @@ class RandomWalkRobot(Robot):
 
 
 # === Problem 6
-
 # For the parameters tested below (cleaning 80% of a 20x20 square room),
 # RandomWalkRobots take approximately twice as long to clean the same room as
 # StandardRobots do.
@@ -376,6 +383,5 @@ def showPlot3():
     pylab.legend(('Random Walk Robots', 'Standard Robots'))
 
     pylab.show()
-
 
 print(runSimulation(2, 1, 20, 20, 1, 100, StandardRobot))

@@ -9,11 +9,12 @@ from ps7 import *
 #
 # PROBLEM 1
 #
+
 class ResistantVirus(SimpleVirus):
 
     """
     Representation of a virus which can have drug resistance.
-    """      
+    """
 
     def __init__(self, maxBirthProb, clearProb, resistances, mutProb):
 
@@ -35,11 +36,9 @@ class ResistantVirus(SimpleVirus):
 
         """
 
-
         self.maxBirthProb = maxBirthProb
         self.clearProb = clearProb
         self.mutProb = mutProb
-
         self.resistances = resistances
 
     def isResistantTo(self, drug):
@@ -54,7 +53,6 @@ class ResistantVirus(SimpleVirus):
         otherwise.
         """
         return self.resistances.get(drug, False)
-
 
     def reproduce(self, popDensity, activeDrugs):
 
@@ -106,13 +104,13 @@ class ResistantVirus(SimpleVirus):
             child_resistances = dict()
             for drug in self.resistances.keys():
                 is_resistant = None
-                
+
                 if self.isResistantTo(drug):
                     if random.random() <= self.mutProb:
                         is_resistant = False
                     else:
                         is_resistant = True
-                        
+
                     child_resistances[ drug ] = is_resistant
 
                 else:
@@ -120,13 +118,14 @@ class ResistantVirus(SimpleVirus):
                         is_resistant = True
                     else:
                         is_resistant = False
-                        
+
                 child_resistances[ drug ] = is_resistant
-                
+
             return ResistantVirus(self.maxBirthProb, self.clearProb, child_resistances, self.mutProb)
 
         else:
             raise NoChildException()
+
 
 class Patient(SimplePatient):
 
@@ -152,7 +151,6 @@ class Patient(SimplePatient):
         self.popDensity = len(viruses)/float(maxPop)
 
         self.Prescriptions = list()
-    
 
     def addPrescription(self, newDrug):
 
@@ -167,10 +165,9 @@ class Patient(SimplePatient):
         """
         # should not allow one drug being added to the list multiple times
         newDrug = newDrug.lower()
-        
+
         if not newDrug in self.getPrescriptions():
             self.Prescriptions.append(newDrug)
-
 
     def getPrescriptions(self):
 
@@ -181,7 +178,6 @@ class Patient(SimplePatient):
         """
 
         return self.Prescriptions
-        
 
     def getResistPop(self, drugResist):
         """
@@ -196,17 +192,16 @@ class Patient(SimplePatient):
         """
         ResistPop = 0
         drugs = len(drugResist)
-        
-        
+
         for virus in self.viruses:
             resistant = True
             for drug in drugResist:
                 if not virus.isResistantTo(drug):
                     resistant = False
                     break
-                
+
             ResistPop += resistant
-            
+
         return ResistPop
 
     def getTotalPop(self):
@@ -300,7 +295,7 @@ def simulationWithDrug(timesteps = 150, num_trials = 30):
     pylab.xlabel( ' Time steps ' )
     pylab.ylabel( ' Number of Viruses ' )
     pylab.legend( loc = 'best' )
-    
+
     pylab.figure(2)
     pylab.plot(range(timesteps, 1 + 2*timesteps), resist_pop, label = 'Resistancy to guttagonol')
     pylab.title( ' Resistant virus population increasement ' )
@@ -332,7 +327,7 @@ def simulationDelayedTreatment(delays = (0, 75, 150, 300), num_trials = 30):
 
         pop_data = list()
         for i in xrange(num_trials):
-            
+
             viruses = list()
             for virus in xrange(num_viruses):
                 viruses.append( ResistantVirus(maxBirthProb, clearProb, resistances, mutProb) )
@@ -343,7 +338,7 @@ def simulationDelayedTreatment(delays = (0, 75, 150, 300), num_trials = 30):
                 if time is drugtime:
                     patient.addPrescription('guttagonol')
                 patient.update()
-            
+
             pop_data.append( patient.getTotalPop() )
 
         data[drugtime] = pop_data
@@ -360,11 +355,10 @@ def simulationDelayedTreatment(delays = (0, 75, 150, 300), num_trials = 30):
         pylab.xlabel( ' Final virus count ' )
         pylab.ylabel( ' Number of trials ' )
         pylab.legend( loc = 'best' )
-        
-#    pylab.title(' Delayed treatment simulation ')
+
+    #    pylab.title(' Delayed treatment simulation ')
     pylab.show()
 
-            
 #
 # PROBLEM 4
 #
@@ -408,7 +402,7 @@ def simulationTwoDrugsDelayedTreatment(lags = (0, 75, 150), num_trials = 1):
         data[lag] = pop_data
 
     pylab.figure(' Two Drugs Delayed Treatment ')
-    
+
     plotNum = 0
     for lag in lags:
         plotNum += 1
@@ -417,7 +411,7 @@ def simulationTwoDrugsDelayedTreatment(lags = (0, 75, 150), num_trials = 1):
         pylab.xlabel(' Final virus counts ')
         pylab.ylabel(' Number of trials ')
         pylab.legend( loc = 'best' )
-        
+
     pylab.show()
 
 #
@@ -435,6 +429,7 @@ def simulationTwoDrugsVirusPopulations(num_trials = 1, lags = (0, 300)):
     a simulations for which drugs are administered simultaneously.        
 
     """
+
     maxBirthProb, clearProb, resistances, mutProb = 0.1, 0.05, {'guttagonol':False, 'grimpex':False}, 0.005
     num_viruses, maxPop = 100, 1000
 
@@ -442,13 +437,13 @@ def simulationTwoDrugsVirusPopulations(num_trials = 1, lags = (0, 300)):
     for lag in lags:
         lagdata = list()
         for trial in xrange(num_trials):
-            
+
             viruses = list()
             for virus in xrange(num_viruses):
                 viruses.append( ResistantVirus(maxBirthProb, clearProb, resistances, mutProb) )
 
             patient = Patient(viruses, maxPop)
-            
+
             for time in xrange(150 + lag + 150):
                 if time is 150:
                     patient.addPrescription('guttagonol')
@@ -458,7 +453,7 @@ def simulationTwoDrugsVirusPopulations(num_trials = 1, lags = (0, 300)):
                 patient.update()
 
             lagdata.append( patient.getTotalPop() )
-            
+
         data[lag] = lagdata
 
     pylab.figure('Two Drugs Lag Simulation')

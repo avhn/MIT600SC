@@ -1,7 +1,6 @@
 # Problem Set 7: Simulating the Spread of Disease and Virus Population Dynamics 
 # Name: Mert Dede
 
-import numpy
 import random
 import pylab
 
@@ -24,6 +23,7 @@ End helper code
 #
 # PROBLEM 1
 #
+
 class SimpleVirus(object):
 
     """
@@ -51,7 +51,7 @@ class SimpleVirus(object):
 
         return random.random() <= self.clearProb
 
-    
+
     def reproduce(self, popDensity):
 
         """
@@ -78,12 +78,13 @@ class SimpleVirus(object):
         else:
             raise NoChildException()
 
+
 class SimplePatient(object):
 
     """
     Representation of a simplified patient. The patient does not take any drugs
     and his/her virus populations have no drug resistance.
-    """    
+    """
 
     def __init__(self, viruses, maxPop):
 
@@ -100,7 +101,7 @@ class SimplePatient(object):
 
         self.viruses = viruses
         self.currPop = len(self.viruses)
-        
+
         self.maxPop = maxPop
         self.popDensity = self.currPop/float(maxPop)
 
@@ -110,7 +111,7 @@ class SimplePatient(object):
         Gets the current total virus population. 
         returns: The total virus population (an integer)
         """
-        return self.currPop 
+        return self.currPop
 
     def update(self):
 
@@ -147,7 +148,7 @@ class SimplePatient(object):
                 new_list.append(mutation)
             except NoChildException:
                 continue
-            
+
         self.viruses += new_list
         self.currPop = len(self.viruses)
 
@@ -156,22 +157,24 @@ class SimplePatient(object):
 #
 # PROBLEM 2
 #
-def runSim(time_steps, num_viruses, maxPop, maxBirthProb, clearProb):
-        """
-        Runs simulation once
-        returns: list of pop data in time steps
-        """
-        viruses = list()
-        for i in xrange(num_viruses):
-            viruses.append( SimpleVirus(maxBirthProb, clearProb) )
-            
-        patient = SimplePatient(viruses, maxPop)
 
-        data = [ len(viruses) ]
-        for s in xrange(time_steps):
-            data.append( patient.update() )
-        return data
-    
+def runSim(time_steps, num_viruses, maxPop, maxBirthProb, clearProb):
+    """
+    Runs simulation once
+    returns: list of pop data in time steps
+    """
+    viruses = list()
+    for i in xrange(num_viruses):
+        viruses.append( SimpleVirus(maxBirthProb, clearProb) )
+
+    patient = SimplePatient(viruses, maxPop)
+
+    data = [ len(viruses) ]
+    for s in xrange(time_steps):
+        data.append( patient.update() )
+    return data
+
+
 def simulationWithoutDrug(num_trials = 1, time_steps = 300, num_viruses = 100, maxPop = 1000, maxBirthProb = 0.1, clearProb = 0.05):
 
     """
@@ -186,17 +189,16 @@ def simulationWithoutDrug(num_trials = 1, time_steps = 300, num_viruses = 100, m
         if len(plot_data) is 0:
             plot_data = trial
             continue
-        
+
         for j in xrange(len(trial)):
             plot_data[j] += trial[j]
 
     for i in xrange(len(plot_data)):
         plot_data[i] /= float(num_trials)
 
-    
+
     pylab.plot( plot_data, label = 'SimpleVirus' )
     pylab.title(' SimpleVirus Simulation ')
     pylab.xlabel(' Time lapse ')
     pylab.ylabel(' Virus Population ')
     pylab.legend(loc = 'best')
-            

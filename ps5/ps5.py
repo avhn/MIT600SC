@@ -1,11 +1,13 @@
 # 6.00 Problem Set 5
 # RSS Feed Filter
 
-import feedparser
 import string
 import time
+import thread
+import feedparser
 from project_util import translate_html
 from news_gui import Popup
+
 
 #-----------------------------------------------------------------------
 #
@@ -52,14 +54,19 @@ class NewsStory(object):
         self.subject = subject
         self.summary = summary
         self.link = link
+
     def get_guid(self):
         return self.guid
+
     def get_title(self):
         return self.title
+
     def get_subject(self):
         return self.subject
+
     def get_summary(self):
         return self.summary
+
     def get_link(self):
         return self.link
 
@@ -84,18 +91,20 @@ class Trigger(object):
 class WordTrigger(Trigger):
     def __init__(self, word):
         self.word = word
+
     def is_word_in(self, text):
         for i in string.punctuation:
             text = text.replace(i, ' ')
         text = text.lower().split()
-        
+
         return self.word.lower() in text
-            
+
 # TODO: TitleTrigger
 
 class TitleTrigger(WordTrigger):
     def __init__(self, word):
         WordTrigger.__init__(self, word)
+
     def evaluate(self, object):
         return self.is_word_in(object.get_title())
 
@@ -104,6 +113,7 @@ class TitleTrigger(WordTrigger):
 class SubjectTrigger(WordTrigger):
     def __init__(self, word):
         WordTrigger.__init__(self, word)
+
     def evaluate(self, object):
         return self.is_word_in(object.get_subject())
 
@@ -112,6 +122,7 @@ class SubjectTrigger(WordTrigger):
 class SummaryTrigger(WordTrigger):
     def __init__(self, word):
         WordTrigger.__init__(self, word)
+
     def evaluate(self, object):
         return self.is_word_in(object.get_summary())
 
@@ -123,24 +134,27 @@ class SummaryTrigger(WordTrigger):
 class NotTrigger(Trigger):
     def __init__(self, trigger):
         self.trigger = trigger
+
     def evaluate(self, object):
         return not self.trigger.evaluate(object)
-        
+
 # TODO: AndTrigger
 
 class AndTrigger(Trigger):
     def __init__(self, trig1, trig2):
         self.trig1 = trig1
         self.trig2 = trig2
+
     def evaluate(self, object):
         return self.trig1.evaluate(object) and self.trig2.evaluate(object)
-        
+
 # TODO: OrTrigger
 
 class OrTrigger(Trigger):
     def __init__(self, trig1, trig2):
         self.trig1 = trig1
         self.trig2 = trig2
+
     def evaluate(self, object):
         return self.trig1.evaluate(object) or self.trig2.evaluate(object)
 
@@ -152,6 +166,7 @@ class OrTrigger(Trigger):
 class PhraseTrigger(object):
     def __init__(self, phrase):
         self.phrase = phrase
+
     def evaluate(self, object):
         """
         Gets NewsStory object. """
@@ -206,7 +221,6 @@ def readTriggerConfig(filename):
     # Build a set of triggers from it and
     # return the appropriate ones
 
-
     # Subfunctions to help
     def find_line(key, lines):
         """
@@ -215,18 +229,18 @@ def readTriggerConfig(filename):
         for line in lines:
             if line.startswith(key):
                 return line[line.find(' ')+1:]
-    
+
     def return_trig(trig, lines):
         """
         Recursive function.
 
         returns: trigger as an object. 
         """
-        
+
         line = find_line(trig, lines).split(' ', 1) # Parse trigger name and args
         trig_name = line[0][:1] + line[0][1:].lower() + 'Trigger'
         args = line[1]
-        
+
         if line[0] not in ['OR', 'AND']: # WordTriggers, PhaseTrigger
             return eval( trig_name + "('"+args+"')" )
         else: # CompositeTriggers
@@ -234,7 +248,7 @@ def readTriggerConfig(filename):
             for trig in args.split():
                 trigs += [return_trig(trig, lines)]
             return eval(trig_name)(trigs[0],trigs[1])
-        
+
     # Function core
     add_list = []
     for line in lines:
@@ -245,8 +259,7 @@ def readTriggerConfig(filename):
     for trig in add_list:
         triggers += [return_trig(trig, lines)]
     return triggers
-    
-import thread
+
 
 def main_thread(p):
     # A sample trigger list - you'll replace
@@ -256,13 +269,13 @@ def main_thread(p):
     t3 = PhraseTrigger("Supreme Court")
     t4 = OrTrigger(t2, t3)
     triggerlist = [t1, t4]
-    
+
     # TODO: Problem 11
     # After implementing readTriggerConfig, uncomment this line 
     triggerlist = readTriggerConfig("triggers.txt")
 
     guidShown = []
-    
+
     while True:
         print("Polling...")
 
@@ -273,13 +286,13 @@ def main_thread(p):
 
         # Only select stories we're interested in
         stories = filter_stories(stories, triggerlist)
-    
+
         # Don't print a story if we have already printed it before
         newstories = []
         for story in stories:
             if story.get_guid() not in guidShown:
                 newstories.append(story)
-        
+
         for story in newstories:
             guidShown.append(story.get_guid())
             p.newWindow(story)
@@ -287,7 +300,8 @@ def main_thread(p):
         print("Sleeping...")
         time.sleep(SLEEPTIME)
 
-SLEEPTIME = 60 #seconds -- how often we poll
+
+SLEEPTIME = 60 # seconds -- how often we poll
 if __name__ == '__main__':
     p = Popup()
     thread.start_new_thread(main_thread, (p,))
