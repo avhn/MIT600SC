@@ -1,6 +1,6 @@
 Algorithm needs,
 - List, contains all combinations of subjects
-- Selector code best
+- Selector code to select best
 
 List, contains all combinations - allAdvices and maxWork comparer func
 

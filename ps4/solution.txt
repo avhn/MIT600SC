@@ -1,4 +1,4 @@
-Problem 2:
+Problem 2-a:
 1. set a tuple for (maximum number of real words, shift number)
 2. for every possible shift from 0 to 27:
 3. shift entire text by this shift
@@ -7,11 +7,11 @@ Problem 2:
 6. if this number of valid words is more than maximum number of real words in the tuple, then
 7. record the numbers of valid words and shift number to the tuple
 8. increment the current possible shift by 1. repeat the loop starting at 2
+9. endfor
+10. return best shift
 
-3. return best shift
 
-
-Problem 4:
+Problem 4-a:
 1. for every possible shift from 0 to 27:
 2. set s to -slice of original text before start- and concatenate with -the shifted with current possible shift after start-
 3. look for spaces specified by beginning of the start paramater
@@ -20,5 +20,5 @@ Problem 4:
 6. if this recursive call to the function produces None, then that means that there was no combination of shifts and positions found that could produce a valid word at the end, so the error in the shift must either be in the current call to the function or an earlier call. continue trying all possible shifts, return to line 1
 7. if there was NOT a space found and the characters from the start location to the end of the string form a word, then that means we have found a valid shift on this call, so return a list containing a tuple containing the start parameter and the current shift
 8. if there was NOT a space found and the characters from the start location to the end of the string do NOT form a word, then we need to try another shift in this call.
-
-2. if we exhaust all possible shifts and still find no solution from other recursive calls to this function, then that means our start position or a previous shift, is incorrect. return None
+9. endfor
+10. if we exhaust all possible shifts and still find no solution from other recursive calls to this function, then that means our start position or a previous shift, is incorrect. return None
